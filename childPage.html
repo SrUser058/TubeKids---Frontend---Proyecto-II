@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TubeKids Playlist</title>
+</head>
+
+<body>
+    <section>
+        <button class="Back" id="back_button" onclick="backPage()">Back</button>
+        <div style="position: relative; overflow: hidden;">
+            <iframe style="pointer-events: none;"  width="1000" height="500"
+                src="https://www.youtube.com/embed/TlWYgGyNnJo?rel=0?version=3&autoplay=1&controls=0&&showinfo=0"
+                frameborder="0"
+                allow="autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowfullscreen
+                ></iframe>
+        </div>
+    </section>
+
+    <script>
+        function backPage() {
+            localStorage.removeItem("childUser");
+            location.href = 'http://localhost:5500/usersPage.html'
+        }
+
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TubeKids - Administrador Page</title>
+</head>
+<script>
+    function navEditPlaylist() {
+        location.href = 'http://localhost:5500/editPlaylistPage.html';
+    }
+    function navEditUsers() {
+        location.href = 'http://localhost:5500/editUsersPage.html';
+    }
+    function backPage() {
+        location.href = 'http://localhost:5500/usersPage.html';
+    }
+    function logOut() {
+        localStorage.clear();
+        location.href = 'http://localhost:5500/login.html';
+    }
+</script>
+
+<script>
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        await fetch(`http://localhost:3001/api/playlist/father/?father=${localStorage.getItem('currentUser')}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                if (data.list === "Void" || data[0].name === "Default Playlist") {
+                    document.getElementById('iframe_space').innerHTML = `<h2>${data.list}</h2>
+                <h3>Yet you don't have a playlist to show, go to the button "Edit PlayList" or click <a href="http://localhost:5500/editPlaylistPage.html">here</a> to go</h3>`;
+                } else {
+                    document.getElementById('iframe_space').innerHTML = `<h2>${data[0].name}</h2>
+                    <iframe id="video_iframe" style="pointer-events: none;"  width="1000" height="500"
+                    src="${data[0].videos[0].URL}?rel=0?version=3&autoplay=1&controls=0&&showinfo=0&&loop=1"
+                    frameborder="0"
+                    allow="autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowfullscreen
+                    ></iframe>`;
+                    loadSelect(data[0].videos)
+                };
+            })
+            .catch(error => {
+                alert('Error while loading the video on the screen')
+                console.log(error);
+            })
+    });
+
+    function loadSelect(playlist) {
+        playlist.forEach(element => {
+            document.getElementById('playlist_select').innerHTML += `<option value="${element.URL}">${element.name}</option>`;
+        });
+    };
+
+    function loadVideo(selectTag) {
+        try {
+            const URL = selectTag.options[selectTag.selectedIndex].value;
+            if (document.getElementById("video_iframe") != undefined) {
+                document.getElementById("video_iframe").remove();
+            }
+            document.getElementById('iframe_space').innerHTML = `
+                    <iframe id="video_iframe" style="pointer-events: none;"  width="1000" height="500"
+                    src="${URL}?rel=0?version=3&autoplay=1&controls=0&&showinfo=0&&loop=1"
+                    frameborder="0"
+                    allow="autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowfullscreen
+                    ></iframe>`;
+        } catch (error) {
+            console.log(error);
+        }
+    };
+</script>
+
+<body>
+    <section id="header">
+        <button class="button_header" onclick="navEditPlaylist()">Edit Playlist</button>
+        <button class="button_header" onclick="navEditUsers()">Edit Users</button>
+        <button class="button_header" onclick="backPage()">Back</button>
+        <button class="button_header" onclick="logOut()">Log Out</button>
+    </section>
+    <section>
+        <div id="iframe_space" style="position: relative; overflow: hidden;"></div>
+        <select name="Select your video" id="playlist_select" onchange="loadVideo(this)"></select>
+    </section>
+    <section>
+        <h4>Tips</h4>
+        <p> - Use the button play/pause on your keyboard to pause or continue the video</p>
+        <p> - In case that you refresh this page, go to other page in the bar menu to autoplay the video</p>
+    </section>
+</body>
+
+</html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TubeKids - Select your User</title>
+    <link rel="stylesheet" href="./CSS/modal.css">
+</head>
+
+<script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        //window.onload = async () => {
+        const adminUser = localStorage.getItem('currentUser');
+        await fetch(`http://localhost:3001/api/childs/father/?father=${adminUser}`,
+            {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.childs != 'void') {
+                    data.forEach(element => {
+                        //console.log(element);
+                            document.getElementById('user_list').innerHTML += `<div class="child_user">
+                            <img src="${putImg(element.avatar)}" alt="user_img" style="height: 200px; width: 200px;">
+                            <h5>${element.name}</h5>
+                            <button id="${element._id}" class="login_button child" onclick="loginAction(this)">Login</button>
+                            </div>`;
+                    });
+                };
+            })
+            .catch(error => {
+                alert("Error while loading the page")
+                console.log(error);
+            })
+            .finally(() => {
+
+                document.getElementById('user_list').innerHTML += `<div id="admin_user">
+            <img src="${putImg(1)}" alt="user_img" style="height: 200px; width: 200px;">
+            <h5>Administrador</h5>
+            <button id="${localStorage.getItem("currentUser")}" class="login_button admin" onclick="loginAction(this)">Login</button>
+            </div>`;
+            });
+        //}
+    });
+
+    function putImg(avatar) {
+        switch (avatar) {
+            case 1: { return 'http://localhost:5500/img/1.svg' }
+            case 2: { return "http://localhost:5500/img/2.svg" }
+            case 3: { return "http://localhost:5500/img/3.svg" }
+            case 4: { return "http://localhost:5500/img/4.svg" }
+            case 5: { return "http://localhost:5500/img/5.svg" }
+        };
+    };
+
+    function loginAction(buttonClicked) {
+        document.getElementsByClassName('modal_login')[0].style.display = 'block';
+        if(buttonClicked.classList[1] == 'child'){
+            localStorage.setItem("childUser", buttonClicked.id);
+        };
+    };
+
+    function closeModal() {
+        document.getElementsByClassName('modal_login')[0].style.display = "none";
+        localStorage.removeItem("childUser");
+    };
+
+    window.onclick = function (event) {
+        const modal = document.getElementsByClassName('modal_login')[0];
+        if (event.target == modal) {
+            modal.style.display = "none";
+            localStorage.removeItem("childUser");
+        }
+    };
+
+    function selectUser() {
+        if(localStorage.getItem("childUser")){
+            loginUser()
+        } else {
+            loginAdmin()
+        }
+    }
+
+    async function loginUser() {
+        await fetch(`http://localhost:3001/api/childs/?id=${localStorage.getItem("childUser")}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                let pin = document.getElementById('input_pin').value.toString();
+                console.log(pin);
+                console.log(data.pin);
+                if (data.pin && data.pin == pin) {
+                    location.href = 'http://localhost:5500/childPage.html';
+                }
+                else {
+                    alert('The pin is wrong, please try again');
+                }
+            })
+            .catch(error => {
+                console.log(error);
+                alert('Something fails while try login, please try later.');
+            });
+    };
+    async function loginAdmin() {
+        await fetch(`http://localhost:3001/api/father/?id=${localStorage.getItem("currentUser")}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                const pin = document.getElementById('input_pin').value;
+                if (data.pin && data.pin == pin) {
+                    location.href = 'http://localhost:5500/adminPage.html';
+                }
+            })
+            .catch(error => {
+                console.log(error);
+                alert('Something fails while try login, please try later.');
+            });
+    };
+</script>
+
+<body>
+    <section id="users">
+        <h3>Select your User</h3>
+        <section id="user_list"></section>
+        <div class="modal_window modal_login">
+            <div class="modal_content">
+                <span class="close" onclick="closeModal()">&times;</span>
+                <label for="input_pin">Enter your Pin</label>
+                <input type="number" id="input_pin">
+                <button class="login_button" onclick="selectUser()">Login</button>
+            </div>
+        </div>
+    </section>
+</body>
+
+</html>

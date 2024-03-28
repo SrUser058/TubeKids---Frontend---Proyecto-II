@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TubeKids - Register your Account!</title>
+</head>
+
+<body>
+    <section>
+        <label for="name">Name</label>
+        <br>
+        <input type="text" id="input_name">
+        <br>
+        <label for="lastname">Lastname</label>
+        <br>
+        <input type="text" id="input_lastname">
+        <br>
+        <label for="email">Email</label>
+        <br>
+        <input type="text" id="input_email">
+        <br>
+        <label for="age">Age</label>
+        <br>
+        <input type="text" id="input_age">
+        <br>
+        <label for="password">Password</label>
+        <br>
+        <input type="text" id="input_password">
+        <br>
+        <label for="confirmation">Confirm your password</label>
+        <br>
+        <input type="text" id="input_confirmation">
+        <br>
+        <label for="pin">Insert a PIN to your administration account with 6 numbers</label>
+        <br>
+        <input type="text" id="input_pin">
+        <br>
+        <label for="birthdate">Your birthdate</label>
+        <br>
+        <input type="text" id="input_birthdate">
+        <br>
+        <label for="country">Your country</label>
+        <br>
+        <input type="text" id="input_country">
+        <br>
+        <button onclick="registerProcess()">Register User</button>
+    </section>
+
+    <script>
+        async function registerProcess() {
+
+            const name = document.getElementById('input_name').value;
+            const lastname = document.getElementById('input_lastname').value;
+            const email = document.getElementById('input_email').value;
+            const password = document.getElementById('input_password').value;
+            const confirmation = document.getElementById('input_confirmation').value;
+            const age = document.getElementById('input_age').value;
+            const pin = document.getElementById('input_pin').value;
+            const birthdate = document.getElementById('input_birthdate').value;
+            const country = document.getElementById('input_country').value;
+            const avatar = 1;
+
+            if (name && lastname && age && age > 18 && email && password && password === confirmation && pin && pin.length == 6) {
+                await fetch(`http://localhost:3001/api/register/?email=${email}`, { method: 'GET' })
+                    .then(response => response.json())
+                    .then(data => {
+                        const veri = data.verification;
+                        if (veri == true) {
+                            let bodySend = {
+                                "name": name,
+                                "lastname": lastname,
+                                "email": email,
+                                "password": password,
+                                "age": age,
+                                "pin": pin,
+                                "birthdate": birthdate,
+                                "country": country,
+                                "avatar": avatar
+                            };
+                            registerUser(bodySend);
+                        } else {
+                            console.log('El correo ya existe en la base de datos.')
+                        }
+                    });
+            } else {
+                console.log('Datos invalidos.');
+                alert('Wrong data in the field');
+            }
+        }
+
+        async function registerUser(bodySend) {
+            await fetch(`http://localhost:3001/api/father/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(bodySend)
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        console.log("Error con la conexion");
+                        throw new Error("Error with the conection");
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    //console.log(data); 
+                    alert('Register completed, you are gonna be transfer to the login page')
+                    location.href = "http://localhost:5500/login.html"
+                })
+                .catch(error => {
+                    console.log(error);
+                    alert('Error while saving your account, please try later')
+                });
+        }
+    </script>
+</body>
+
+</html>
