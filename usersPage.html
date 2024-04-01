@@ -10,7 +10,7 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', async () => {
-        //window.onload = async () => {
+        console.log(localStorage.getItem('currentUser'));
         const adminUser = localStorage.getItem('currentUser');
         await fetch(`http://localhost:3001/api/childs/father/?father=${adminUser}`,
             {
@@ -23,7 +23,7 @@
             .then(data => {
                 if (data.childs != 'void') {
                     data.forEach(element => {
-                        //console.log(element);
+                        console.log(element);
                             document.getElementById('user_list').innerHTML += `<div class="child_user">
                             <img src="${putImg(element.avatar)}" alt="user_img" style="height: 200px; width: 200px;">
                             <h5>${element.name}</h5>
@@ -133,7 +133,7 @@
 <body>
     <section id="users">
         <h3>Select your User</h3>
-        <section id="user_list"></section>
+        <section id="user_list" style="display:inline-flex;"></section>
         <div class="modal_window modal_login">
             <div class="modal_content">
                 <span class="close" onclick="closeModal()">&times;</span>
