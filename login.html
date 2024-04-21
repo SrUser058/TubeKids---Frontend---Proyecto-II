@@ -11,48 +11,25 @@
     <section id="login">
         <h3>Login TubeKids</h3>
         <br>
-        <label for="">Email</label>
+        <label>
+            Email
+            <input type="text" id="input_email">
+        </label>
         <br>
-        <input type="text" id="input_email">
-        <br> <br>
-        <label for="">Password</label>
         <br>
-        <input type="password" id="input_password">
+        <label >
+            Password
+            <input type="password" id="input_password">
+            <input type="checkbox" value="show1" onclick="showPasswordRegister(this.value)">
+        </label>
+        <br>
         <br>
         <button id="button_login" onclick="loginAction()">Login</button>
         <br>
         <p>Don't have a account? <a href="./register.html">Register Now!</a></p>
     </section>
-
-    <script>
-        async function loginAction() {
-            const email = document.getElementById('input_email').value;
-            const password = document.getElementById('input_password').value;
-            if (email && password) {
-                await fetch(`http://localhost:3001/api/login/?email=${email}&password=${password}`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    }
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log(data.verification);
-                        if (data.verification == true) {
-                            //console.log('Login sucess');
-                            localStorage.setItem("currentUser", `${data.id}`);
-                            location.href = "http://localhost:5500/usersPage.html"
-                        } else {
-                            console.log('The email or passssword are incorrect');
-                            alert('The email or password are wrong');
-                        }
-                    })
-            } else {
-                alert('The email or password are avoid, please enter your email and password')
-                console.log('Data invalid');
-            }
-        }
-    </script>
+    <script src="./JS/password.js"></script>
+    <script src="./JS/pages/login.js"></script>
 </body>
 
 </html>
