@@ -1,16 +1,21 @@
 
 document.addEventListener('DOMContentLoaded', async () => {
     loadAdmin();
-    await fetch(`http://localhost:3001/api/childs/father/?father=${localStorage.getItem("currentUser")}`,
+    const query = `query{childsGetByFather(father:"${localStorage.getItem("currentUser")}"){
+        _id,name,age,pin,avatar
+      }}`;
+    await fetch(`http://localhost:3000/graphql`,
         {
-            method: 'GET',
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-            }
+            },
+            body: JSON.stringify({ query })
         })
         .then(response => response.json())
+        .then(answer => answer.data.childsGetByFather)
         .then(data => {
-            if (data.childs != 'void') {
+            if (data[0]) {
                 data.forEach(element => {
                     document.getElementById("user_list").innerHTML += `<div class="child_user">
                 <img src="${putImg(element.avatar)}" alt="user_img" style="height: 50px; width: 50px;">
@@ -47,14 +52,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 async function loadAdmin() {
-    await fetch(`http://localhost:3001/api/father/?id=${localStorage.getItem("currentUser")}`,
+    const query = `query{fathersGetAll(_id:"${localStorage.getItem("currentUser")}"){
+        _id,name, lastname, email, phone, age, pin,
+        password, country, birthdate, status, avatar
+      }}`
+    await fetch(`http://localhost:3000/graphql`,
         {
-            method: 'GET',
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-            }
+            },
+            body: JSON.stringify({ query })
         })
         .then(response => response.json())
+        .then(answer => answer.data.fathersGetAll)
         .then(data => {
             document.getElementById("user_list").innerHTML += `<div class="admin_user">
                 <img src="${putImg(data.avatar)}" alt="user_img" style="height: 80px; width: 80px;">
@@ -67,6 +78,9 @@ async function loadAdmin() {
 
                 <label >Email
                 <input type="text" id="admin_email" value="${data.email}"></label>
+
+                <label >Phone
+                <input type="number" id="admin_phone" value="${data.phone}"></label>
 
                 <label >Age
                 <input type="text" id="admin_age" value="${data.age}"></label>
@@ -131,33 +145,6 @@ function loadCreateChild() {
                 </div>`;
 }
 
-function putImg(avatar) {
-    switch (avatar) {
-        case 1: { return "http://localhost:5500/img/1.svg" }
-        case 2: { return "http://localhost:5500/img/2.svg" }
-        case 3: { return "http://localhost:5500/img/3.svg" }
-        case 4: { return "http://localhost:5500/img/4.svg" }
-        case 5: { return "http://localhost:5500/img/5.svg" }
-    };
-};
-
-function showPassword(value) {
-    if (value == 'show1') {
-        if (document.getElementById('admin_password').type === "password") {
-            document.getElementById('admin_password').type = "text";
-        } else {
-            document.getElementById('admin_password').type = "password";
-        }
-    } else {
-        if (document.getElementById('admin_confirmation').type === "password") {
-            document.getElementById('admin_confirmation').type = "text";
-        } else {
-            document.getElementById('admin_confirmation').type = "password";
-        }
-    }
-
-};
-
 async function editAdminAction() {
 
     const select = document.getElementById('admin_select');
@@ -166,12 +153,20 @@ async function editAdminAction() {
         "lastname": document.getElementById('admin_lastname').value,
         "email": document.getElementById('admin_email').value,
         "age": document.getElementById('admin_age').value,
+        "phone": document.getElementById('admin_phone').value,
         "password": document.getElementById('admin_password').value,
         "pin": document.getElementById('admin_pin').value,
         "country": document.getElementById('admin_country').value,
         "birthdate": document.getElementById('admin_birthdate').value,
         "avatar": select.options[select.selectedIndex].value
     };
+
+    if (!bodySended.name || !bodySended.lastname || !bodySended.age || bodySended.age < 18 || !bodySended.email
+        || !bodySended.password || !bodySended.password === document.getElementById('admin_confirmation') || !bodySended.pin
+        || bodySended.pin.length != 6) {
+        throw new Error(alert("Inconsistencia en los datos, por favor seguir el estandar"))
+    }
+
     await fetch(`http://localhost:3001/api/father/?id=${localStorage.getItem("currentUser")}`,
         {
             method: 'PATCH',
@@ -192,17 +187,20 @@ async function editAdminAction() {
         });
 };
 
-async function createChildAction(){
+async function createChildAction() {
     const select = document.getElementsByClassName('create_select')[0];
     const bodySended = {
-        //document.getElementsByClassName('65f89e93fa844f75887a33b6')
         "name": document.getElementsByClassName('create_input')[0].value,
         "age": document.getElementsByClassName('create_input')[1].value,
         "pin": document.getElementsByClassName('create_input')[2].value,
-        "father":localStorage.getItem("currentUser"),
+        "father": localStorage.getItem("currentUser"),
         "avatar": select.options[select.selectedIndex].value
     };
 
+    if (!bodySended.age || bodySended.age > 18 || !bodySended.pin || bodySended.pin.length != 6) {
+        throw new Error(alert("Inconsistencia en los datos, por favor seguir el estandar"))
+    }
+    
     await fetch(`http://localhost:3001/api/childs/`,
         {
             method: 'POST',
