@@ -2,9 +2,9 @@
 document.addEventListener('DOMContentLoaded', async () => {
     const query = `query{
         playlistGetByFather(father:"${localStorage.getItem("currentUser")}"){
-            _id,name,
+            _id,name,father,
             linked{child},
-            videos{name,URL,description}
+            videos{_id,name,URL,description}
           }
     }`;
     await fetch(`http://localhost:3000/graphql`,
@@ -12,13 +12,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Accept': 'application/json'
             },
             body: JSON.stringify({ query })
         })
         .then(response => response.json())
         .then(answer => answer.data.playlistGetByFather)
         .then(data => {
-            //console.log(data[0].videos[0]);
             if (!data[0]) {
                 createPlaylist();
                 document.getElementById("videos_list").innerHTML = `<h2>Void</h2>
@@ -26,39 +26,52 @@ document.addEventListener('DOMContentLoaded', async () => {
             } else {
                 data.forEach(playlist => {
                     let videosList = '';
-                    let linkedList = '';
-                    playlist.videos.forEach(element => {
+
+                    playlist.videos.forEach(video => {
                         videosList += `
                         <label>
                             Name
-                            <input class="video_name video_input ${element._id}" type="text" value="${element.name}">
+                            <input class="video_name video_input ${playlist._id} ${video._id}" type="text" value="${video.name}">
                         </label>
                         <label> 
                             URL
-                            <input class="video_URL video_input ${element._id}" type="text" value="${element.URL}">
+                            <input class="video_URL video_input ${playlist._id} ${video._id}" type="text" value="${video.URL}">
                         </label>
-                        <button value="${element._id}" class="video" onclick="deleteVideoAction(this.value)">Delete</button>
+                        <button class="video ${playlist._id} ${video._id}" onclick="deleteVideoAction(this.classList[1],this.classList[2])">Delete Video</button>
+                        <br>
+                        <label>
+                            Description
+                            <br><textarea class="video_text video_input ${playlist._id} ${video._id}" cols="55" rows="5">${video.description}</textarea>
+                        </label>
                         `;
                     });
-                    playlist.linked.forEach(element => {
-                        linkedList += `
-                        <option class="linked" value="${element.child}">${getChildName(element.child)}</option>
-                        `;
-                    });
-                    
-                    
-                    
-                    document.getElementById("videos_list").innerHTML += `<h2>${playlist.name}</h2>
+
+                    document.getElementById("videos_list").innerHTML += `<h3>${playlist.name}</h3>
                         <label> Playlist Name
                             <input class="playlist_name playlist_input ${playlist._id}" type="text" value="${playlist.name}">
                         </label>
-                        <select class="linked_list ${playlist._id}" id=""></select>
-                        <div class="video_content"> ${videosList}
-                            <button value="${playlist._id}" id="video_update" class="video"
-                            onclick="editVideoAction(this.value)">Update</button> 
+
+                        <br> <br>
+                        <select class="linked_list ${playlist._id}" ></select>
+                        <button id="detele_child" class="${playlist._id}" onclick="deleteChild(this.classList[0])">Delete</button>
+
+                        <select class="unlinked_list ${playlist._id}" ></select>
+                        <button id="add_child" class="${playlist._id}" onclick="addChild(this.classList[0])">Add</button>
+
+                        <div class="video_content"> <br> ${videosList}
+                        <br>
+                            <button id="playlist_update" class="playlist ${playlist._id}"
+                            onclick="editPlaylistAction(this.classList[1])">Update Playlist</button> 
+                            <button id="playlist_delete" class="playlist ${playlist._id}"
+                            onclick="deletePlaylistAction(this.classList[1])">Delete Playlist</button> 
                          </div>`;
+
+                    playlist.linked.forEach(element => {
+                        getChildsInList(element.child,playlist._id)
+                    });
+                    getChildsOutList(playlist.father,playlist._id);
+                    loadCreateVideo(playlist.father);
                 })
-                loadCreateVideo(playlist._id);
             };
         })
         .catch(error => {
@@ -67,7 +80,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 });
 
-async function getChildName(childID) {
+// <-------------------------------------------------------->
+
+// <----------------Fetchs and Functions-------------------->
+
+// <-------------------------------------------------------->
+
+async function getChildsInList(childID,playlistId) {
     const query = `query{
         childsGetAll(_id:"${childID}"){
             name
@@ -78,19 +97,59 @@ async function getChildName(childID) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Accept': 'application/json'
             },
             body: JSON.stringify({ query })
         })
-        .then(response => response.json())
-        .then(answer => {return answer.data.childsGetAll.name})
-}
+        .then(async response => response.json())
+        .then(answer => answer.data.childsGetAll.name)
+        .then(data => {
+            let linkedList = `<option class="linked ${playlistId} ${childID}">${data}</option>`;
+            document.getElementsByClassName(`linked_list ${playlistId}`)[0].innerHTML += linkedList;
+        })
+};
+
+async function getChildsOutList(fatherID, playlistId) {
+    const query = `query{
+        childsGetByFather(father:"${fatherID}"){
+            _id,
+            name
+          }
+    }`;
+    await fetch(`http://localhost:3000/graphql`,
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ query })
+        })
+        .then(async response => response.json())
+        .then(answer => answer.data.childsGetByFather)
+        .then(data => {
+            let unlinkedList = '';
+            const linkedList = Array.from(document.getElementsByClassName("linked"));
+            data.forEach(child => {
+                //console.log(linkedList);
+                const verif = linkedList.some(x=>x.text == child.name);
+                if(verif === false){
+                    unlinkedList = `<option class="unlinked ${playlistId} ${child._id}">${child.name}</option>`;
+                    document.getElementsByClassName(`unlinked_list ${playlistId}`)[0].innerHTML += unlinkedList;
+                }
+            });
+        })
+}; 
 
 function loadCreateVideo(valueId) {
-    document.getElementById("videos_list").innerHTML += `<label> Name
-                        <input class="video_name create_video" type="text"></label>
+    document.getElementById("videos_list").innerHTML += `<p>Add a New Video in This Playlist</p>
+                        <label> Name
+                            <input class="video_name create_video" type="text"></label>
                         <label> URL
-                        <input class="video_URL create_video" type="text"></label>
-                        <button value="${valueId}" class="video" onclick="createVideoAction(this.value)">Create</button>`
+                            <input class="video_URL create_video" type="text"></label> <br>
+                        <label> Description <br>
+                           <textarea class="video description create_text" cols="55" rows="5"></textarea> </label>
+                           <br><button value="${valueId}" class="video " onclick="createVideoAction(this.value)">Create</button>`
 };
 
 async function createPlaylist() {
@@ -100,7 +159,8 @@ async function createPlaylist() {
             "name": "Enter a youtube URL",
             URL: "The URL must be like: https://www.youtube.com/watch?v={Here the code of the video}"
         },
-        "father": localStorage.getItem("currentUser")
+        "father": localStorage.getItem("currentUser"),
+        "linked": []
     };
 
     await fetch(`http://localhost:3001/api/playlists/`,
@@ -121,6 +181,111 @@ async function createPlaylist() {
             console.log(error);
             alert('Error while loading a change in the server');
         });
+};
+
+// <-------------------------------------------------------->
+
+// <---------------------Button Actions--------------------->
+
+// <-------------------------------------------------------->
+
+function modifyURL(url) {
+    try {
+        let oldURL = new String(url);
+        let newURL = oldURL.replace('watch?v=', 'embed/')
+        return newURL;
+    } catch {
+        alert('The URL isnt of Youtube');
+        throw new Error("Something had wrong while update the playlist");
+    };
+};
+
+async function patchFetch(bodySended,valueId) {
+    await fetch(`http://localhost:3001/api/playlists/?id=${valueId}`,
+        {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(bodySended)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status != 422) {
+                location.href = 'http://localhost:5500/editPlaylistPage.html';
+            } else {
+                alert('Error while loading the changes in the server');
+                throw new Error("Something had wrong while update the playlist");
+            }
+        })
+        .catch(error => {
+            console.log(error);
+            alert('Error while loading the changes in the server');
+        });
+};
+
+function addChild(valueId) {
+    const unlinkedTag = document.getElementById('unlinked_child_select');
+    const childAdd = unlinkedTag.options[unlinkedTag.selectedIndex].classList[2];
+    let childs = [];
+    childs.push({"child":childAdd});
+    const amoung = document.getElementsByClassName(`linked ${valueId}`);
+
+    for (let x = 0; x < amoung.length; x++) {
+        childs.push({"child":amoung[x].classList[2]});
+    }
+
+    let videosList = [];
+    const amountV = document.getElementsByClassName(`video_input ${valueId}`).length - 3;
+    for (let x = 0; x <= amountV; x = x + 2) {
+        let oldV = {
+            "name": document.getElementsByClassName(`video_input ${valueId}`)[x].value,
+            "URL": document.getElementsByClassName(`video_input ${valueId}`)[x + 1].value,
+            "description": document.getElementsByClassName(`video_input ${valueId}`)[x + 2].value
+        };
+        videosList.push(oldV);
+    };
+
+    const bodySended = {
+        name: document.getElementsByClassName(`playlist_input ${valueId}`)[0].value,
+        "videos": videosList,
+        "father": localStorage.getItem("currentUser"),
+        "linked": childs
+    };
+    console.log(bodySended);
+    patchFetch(bodySended,valueId);
+}
+
+function deleteChild(valueId){
+    const linkedTag = document.getElementById('linked_child_select');
+    const childDelete = linkedTag.options[linkedTag.selectedIndex].value;
+    let childs = [];
+    // 
+    const amoung = document.getElementsByClassName(`linked ${valueId}`);
+    for (let x = 0; x < amoung.length; x++) {
+        if (amoung[x].value != childDelete) {
+            childs.push({"child":amoung[x].classList[2]});
+        };
+    }
+    let videosList = [];
+    const amountV = document.getElementsByClassName(`video_input ${valueId}`).length - 3;
+    for (let x = 0; x <= amountV; x = x + 2) {
+        let oldV = {
+            "name": document.getElementsByClassName(`video_input ${valueId}`)[x].value,
+            "URL": document.getElementsByClassName(`video_input ${valueId}`)[x + 1].value,
+            "description": document.getElementsByClassName(`video_input ${valueId}`)[x + 2].value
+        };
+        videosList.push(oldV);
+    };
+
+    const bodySended = {
+        name: document.getElementsByClassName(`playlist_input ${valueId}`)[0].value,
+        "videos": videosList,
+        "father": localStorage.getItem("currentUser"),
+        "linked": childs
+    };
+
+    patchFetch(bodySended,valueId);
 }
 
 async function createVideoAction(valueId) {
@@ -132,119 +297,103 @@ async function createVideoAction(valueId) {
     };
     videosList.push(createVideo);
 
-    const amountV = document.getElementsByClassName('video_input').length - 2;
+    const amountV = document.getElementsByClassName(`video_input ${valueId}`).length - 3;
     for (let x = 0; x <= amountV; x = x + 2) {
         let oldV = {
-            "name": document.getElementsByClassName('video_input')[x].value,
-            "URL": document.getElementsByClassName('video_input')[x + 1].value
+            "name": document.getElementsByClassName(`video_input ${valueId}`)[x].value,
+            "URL": document.getElementsByClassName(`video_input ${valueId}`)[x + 1].value,
+            "description": document.getElementsByClassName(`video_input ${valueId}`)[x + 2].value
         };
         videosList.push(oldV);
     };
 
+    let childs = [];
+    const amoung = document.getElementsByClassName(`linked ${valueId}`);
+
+    for (let x = 0; x < amoung.length; x++) {
+        childs.push({"child":amoung[x].classList[2]});
+    }
 
     const bodySended = {
-        name: document.getElementsByClassName('playlist_input')[0].value,
+        name: document.getElementsByClassName(`playlist_input ${valueId}`)[0].value,
         "videos": videosList,
-        "father": localStorage.getItem("currentUser")
+        "father": localStorage.getItem("currentUser"),
+        "linked": childs
     };
-    //console.log(valueId);
-    await fetch(`http://localhost:3001/api/playlists/?id=${valueId}`,
-        {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(bodySended)
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.result != 422) {
-                location.href = 'http://localhost:5500/editPlaylistPage.html';
-            } else {
-                alert('Error while loading the changes in the server');
-                throw new Error("Something had wrong while update the playlist");
-            }
-        })
-        .catch(error => {
-            console.log(error);
-            alert('Error while loading the changes in the server');
-        });
+
+    patchFetch(bodySended,valueId);
 }
 
-async function editVideoAction(videoId) {
+function editPlaylistAction(valueId) {
     let videosList = [];
-    const amountV = document.getElementsByClassName('video_input').length - 2;
-    for (let x = 0; x <= amountV; x = x + 2) {
+    const amountV = document.getElementsByClassName(`video_input ${valueId}`).length - 3;
+    for (let x = 0; x <= amountV; x = x + 3) {
 
         let oldV = {
-            "name": document.getElementsByClassName('video_input')[x].value,
-            "URL": modifyURL(document.getElementsByClassName('video_input')[x + 1].value)
+            "name": document.getElementsByClassName(`video_input ${valueId}`)[x].value,
+            "URL": modifyURL(document.getElementsByClassName(`video_input ${valueId}`)[x + 1].value),
+            "description": document.getElementsByClassName(`video_input ${valueId}`)[x + 2].value
         };
         videosList.push(oldV);
     };
 
+    let childs = [];
+    const amoung = document.getElementsByClassName(`linked ${valueId}`);
+
+    for (let x = 0; x < amoung.length; x++) {
+        childs.push({"child":amoung[x].classList[2]});
+    }
+
     const bodySended = {
-        name: document.getElementsByClassName('playlist_input')[0].value,
+        name: document.getElementsByClassName(`playlist_input ${valueId}`)[0].value,
         "videos": videosList,
-        "father": localStorage.getItem("currentUser")
+        "father": localStorage.getItem("currentUser"),
+        "linked": childs
     };
     //console.log(valueId);
-    await fetch(`http://localhost:3001/api/playlists/?id=${valueId}`,
-        {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(bodySended)
-        })
-        .then(response => response.json())
-        .then(data => {
-
-            if (data.result != 422) {
-                location.href = 'http://localhost:5500/editPlaylistPage.html';
-            } else {
-                alert('Error while loading the changes in the server');
-                throw new Error("Something had wrong while update the playlist");
-            }
-        })
-        .catch(error => {
-            console.log(error);
-            alert('Error while loading the changes in the server');
-        });
+    patchFetch(bodySended,valueId);
 }
 
-async function deleteVideoAction(videoId) {
+function deleteVideoAction(valueId,videoId) {
 
     let videosList = [];
-    const valueId = document.getElementById('video_update').value;
-    const amountV = document.getElementsByClassName('video_input').length - 2;
-    for (let x = 0; x <= amountV; x = x + 2) {
-        if (document.getElementsByClassName('video_input')[x + 1].classList[2] != videoId) {
+    const amountV = document.getElementsByClassName(`video_input ${valueId}`).length - 3;
+    for (let x = 0; x <= amountV; x = x + 3) {
+        if (document.getElementsByClassName(`video_input ${valueId}`)[x + 1].classList[2] != videoId) {
             let oldV = {
-                "name": document.getElementsByClassName('video_input')[x].value,
-                "URL": modifyURL(document.getElementsByClassName('video_input')[x + 1].value)
+                "name": document.getElementsByClassName(`video_input ${valueId}`)[x].value,
+                "URL": modifyURL(document.getElementsByClassName(`video_input ${valueId}`)[x + 1].value),
+                "description": document.getElementsByClassName(`video_input ${valueId}`)[x + 2].value
             };
             videosList.push(oldV);
         };
     };
-    console.log(videosList);
+    let childs = [];
+    const amoung = document.getElementsByClassName(`linked ${valueId}`);
+
+    for (let x = 0; x < amoung.length; x++) {
+        childs.push({"child":amoung[x].classList[2]});
+    }
     const bodySended = {
-        name: document.getElementsByClassName('playlist_input')[0].value,
+        name: document.getElementsByClassName(`playlist_input ${valueId}`)[0].value,
         "videos": videosList,
-        "father": localStorage.getItem("currentUser")
+        "father": localStorage.getItem("currentUser"),
+        "linked": childs
     };
-    //console.log(valueId);
+    patchFetch(bodySended,valueId);
+};
+
+async function deletePlaylistAction(valueId) {
     await fetch(`http://localhost:3001/api/playlists/?id=${valueId}`,
         {
-            method: 'PATCH',
+            method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(bodySended)
+            }
         })
         .then(response => response.json())
         .then(data => {
-            if (data.result != 422) {
+            if (data.status != 422) {
                 location.href = 'http://localhost:5500/editPlaylistPage.html';
             } else {
                 alert('Error while loading the changes in the server');
@@ -255,15 +404,4 @@ async function deleteVideoAction(videoId) {
             console.log(error);
             alert('Error while loading the changes in the server');
         });
-}
-
-function modifyURL(url) {
-    try {
-        let oldURL = new String(url);
-        let newURL = oldURL.replace('watch?v=', 'embed/')
-        return newURL;
-    } catch {
-        alert('The URL isnt of Youtube');
-        throw new Error("Something had wrong while update the playlist");
-    };
-}
+};
