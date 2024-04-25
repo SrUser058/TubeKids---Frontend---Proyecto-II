@@ -1,5 +1,5 @@
 
-function backLogin(){
+function backLogin() {
     location.href = "http://localhost:5500/login.html"
 }
 
@@ -18,17 +18,29 @@ async function registerProcess() {
     const country = document.getElementById('input_country').value;
     const avatar = 1;
 
-    if (name && lastname && age && age > 18 && email && password && password === confirmation && pin && pin.length == 6) {
-        await fetch(`http://localhost:3001/api/register/?email=${email}`, { method: 'GET' })
+    if (name && lastname && age && age > 18 && email && password && password === confirmation && pin && pin.length == 6 && phone) {
+        await fetch(`http://localhost:3000/graphql`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({query:`query{
+                    fathersGetEmail(email:"${email}"){
+                        email
+                      }
+                }`})
+            })
             .then(response => response.json())
+            .then(answer => answer.data.fathersGetEmail)
             .then(data => {
-                const veri = data.verification;
-                if (veri == true) {
+                console.log(data);
+                if (!data) {
                     let bodySend = {
                         "name": name,
                         "lastname": lastname,
                         "email": email,
-                        "phone":phone,
+                        "phone": phone,
                         "password": password,
                         "age": age,
                         "pin": pin,
@@ -64,13 +76,13 @@ async function registerUser(bodySend) {
             return response.json();
         })
         .then(data => {
-            if(data) 
-            alert('Register completed, you are gonna be transfer to the login page')
+            if (data)
+                alert('Register completed, you are gonna be transfer to the login page')
             location.href = "http://localhost:5500/login.html"
         })
         .catch(error => {
             console.log(error);
             alert('Error while saving your account, please try later')
-            
+
         });
 };

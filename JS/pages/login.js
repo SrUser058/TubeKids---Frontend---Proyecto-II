@@ -9,7 +9,8 @@ async function loginAction() {
             fathersGetEmail(email:"${email}"){
                 _id,
                 email,
-                password
+                password,
+                status
             }
       }`;
         await fetch(`http://localhost:3000/graphql`, {
@@ -23,12 +24,12 @@ async function loginAction() {
             .then(response => response.json())
             .then(answer => answer.data.fathersGetEmail) //To do easy the way to read the json
             .then(data => {       
-                if(data && data.email == email && data.password == password){
+                if(data && data.email == email && data.password == password && data.status == true){
                     localStorage.setItem("currentUser", `${data._id}`);
                     location.href = "http://localhost:5500/usersPage.html"
                 } else {
-                    alert('The email or password are avoid, please enter your email and password')
-                    console.log('Data invalid');
+                    alert('The email or password are avoid or dont verify your account yet!, please enter your email and password or check your email application')
+                    console.log('Data invalid or you need verify your account first');
                 }
                     
                 /*if (data.verification == true) {
