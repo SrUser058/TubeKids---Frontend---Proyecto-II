@@ -28,6 +28,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     let videosList = '';
 
                     playlist.videos.forEach(video => {
+                        console.log(video);
                         videosList += `
                         <label>
                             Name
@@ -82,7 +83,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // <-------------------------------------------------------->
 
-// <----------------Fetchs and Functions-------------------->
+// <------------Loaded Fetchs and Functions----------------->
 
 // <-------------------------------------------------------->
 
@@ -336,6 +337,8 @@ function editPlaylistAction(valueId) {
         };
         videosList.push(oldV);
     };
+
+    //console.log(videosList[0].description);
 
     let childs = [];
     const amoung = document.getElementsByClassName(`linked ${valueId}`);
