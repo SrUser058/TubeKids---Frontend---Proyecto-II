@@ -23,10 +23,11 @@ async function loginAction() {
         })
             .then(response => response.json())
             .then(answer => answer.data.fathersGetEmail) //To do easy the way to read the json
-            .then(data => {       
-                if(data && data.email == email && data.password == password && data.status == true){
+            .then(data => {    
+                console.log(email); console.log(password);console.log(data);  
+                if(data && data.email == email && data.password == password && data.status == 'true'){
                     localStorage.setItem("currentUser", `${data._id}`);
-                    location.href = "http://localhost:5500/usersPage.html"
+                    location.href = "http://localhost:5500/authetication.html"
                 } else {
                     alert('The email or password are avoid or dont verify your account yet!, please enter your email and password or check your email application')
                     console.log('Data invalid or you need verify your account first');
