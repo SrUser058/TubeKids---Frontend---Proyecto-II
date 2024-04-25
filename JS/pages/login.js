@@ -23,7 +23,6 @@ async function loginAction() {
             .then(response => response.json())
             .then(answer => answer.data.fathersGetEmail) //To do easy the way to read the json
             .then(data => {       
-                //console.log(data);
                 if(data && data.email == email && data.password == password){
                     localStorage.setItem("currentUser", `${data._id}`);
                     location.href = "http://localhost:5500/usersPage.html"

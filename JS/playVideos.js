@@ -160,7 +160,6 @@ async function searchPlaylist() {
             } else {
                 let foundList = [];
                 const searchText = document.getElementById('search_input').value.toLowerCase();
-                console.log(searchText);
                 let name = "";
                 let description = "";
                 data.forEach(playlist => {
@@ -172,7 +171,6 @@ async function searchPlaylist() {
                         }
                     });
                 })
-                console.log(foundList);
                 deleteSelect('found_select');
                 document.getElementById('search_space').innerHTML += '<select id="found_select" onchange="loadVideo(this.id)" hidden></select>';
                 foundList.forEach(element => {

@@ -1,6 +1,5 @@
 
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log(localStorage.getItem('currentUser'));
     const adminUser = localStorage.getItem('currentUser');
     const query = `query{
             childsGetByFather(father:"${adminUser}"){

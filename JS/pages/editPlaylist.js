@@ -28,7 +28,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                     let videosList = '';
 
                     playlist.videos.forEach(video => {
-                        console.log(video);
                         videosList += `
                         <label>
                             Name
@@ -132,7 +131,6 @@ async function getChildsOutList(fatherID, playlistId) {
             let unlinkedList = '';
             const linkedList = Array.from(document.getElementsByClassName("linked"));
             data.forEach(child => {
-                //console.log(linkedList);
                 const verif = linkedList.some(x=>x.text == child.name);
                 if(verif === false){
                     unlinkedList = `<option class="unlinked ${playlistId} ${child._id}">${child.name}</option>`;
@@ -253,7 +251,6 @@ function addChild(valueId) {
         "father": localStorage.getItem("currentUser"),
         "linked": childs
     };
-    console.log(bodySended);
     patchFetch(bodySended,valueId);
 }
 
@@ -338,8 +335,6 @@ function editPlaylistAction(valueId) {
         videosList.push(oldV);
     };
 
-    //console.log(videosList[0].description);
-
     let childs = [];
     const amoung = document.getElementsByClassName(`linked ${valueId}`);
 
@@ -353,7 +348,6 @@ function editPlaylistAction(valueId) {
         "father": localStorage.getItem("currentUser"),
         "linked": childs
     };
-    //console.log(valueId);
     patchFetch(bodySended,valueId);
 }
 
