@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             method: 'POST',
             headers: {'Content-Type': 'application/json',
             'Accept': 'application/json',
-            'authorization':localStorage.getItem("token")
+            'authorization':`Bearer ${localStorage.getItem("token")}`
         },
             body: JSON.stringify({ query })
         })
@@ -97,7 +97,7 @@ async function getChildsInList(childID,playlistId) {
             method: 'POST',
             headers: {'Content-Type': 'application/json',
             'Accept': 'application/json',
-            'authorization':localStorage.getItem("token")
+            'authorization':`Bearer ${localStorage.getItem("token")}`
         },
             body: JSON.stringify({ query })
         })
@@ -121,7 +121,7 @@ async function getChildsOutList(fatherID, playlistId) {
             method: 'POST',
             headers: {'Content-Type': 'application/json',
             'Accept': 'application/json',
-            'authorization':localStorage.getItem("token")
+            'authorization':`Bearer ${localStorage.getItem("token")}`
         },
             body: JSON.stringify({ query })
         })
@@ -168,7 +168,7 @@ async function createPlaylist() {
             method: 'POST',
             headers: {'Content-Type': 'application/json',
             'Accept': 'application/json',
-            'authorization':localStorage.getItem("token")
+            'authorization':`Bearer ${localStorage.getItem("token")}`
         },
             body: JSON.stringify(bodySended)
         })
@@ -207,7 +207,7 @@ async function patchFetch(bodySended,valueId) {
             method: 'PATCH',
             headers: {'Content-Type': 'application/json',
             'Accept': 'application/json',
-            'authorization':localStorage.getItem("token")
+            'authorization':`Bearer ${localStorage.getItem("token")}`
         },
             body: JSON.stringify(bodySended)
         })
@@ -391,7 +391,7 @@ async function deletePlaylistAction(valueId) {
             method: 'DELETE',
             headers: {'Content-Type': 'application/json',
             'Accept': 'application/json',
-            'authorization':localStorage.getItem("token")
+            'authorization':`Bearer ${localStorage.getItem("token")}`
         }
         })
         .then(response => response.json())

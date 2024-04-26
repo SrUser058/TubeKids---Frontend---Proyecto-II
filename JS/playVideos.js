@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         method: 'POST',
         headers: {'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'authorization':localStorage.getItem("token")
+        'authorization':`Bearer ${localStorage.getItem("token")}`
     },
         body: JSON.stringify({ query })
     })
@@ -85,7 +85,7 @@ async function loadSelectVideos() {
             method: 'POST',
             headers: {'Content-Type': 'application/json',
             'Accept': 'application/json',
-            'authorization':localStorage.getItem("token")
+            'authorization':`Bearer ${localStorage.getItem("token")}`
         },
             body: JSON.stringify({ query })
         })
@@ -143,7 +143,7 @@ async function searchPlaylist() {
         method: 'POST',
         headers: {'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'authorization':localStorage.getItem("token")
+        'authorization':`Bearer ${localStorage.getItem("token")}`
     },
         body: JSON.stringify({ query })
     })

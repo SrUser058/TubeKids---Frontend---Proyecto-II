@@ -7,7 +7,8 @@ addEventListener('DOMContentLoaded', async () => {
             method: 'GET',
             headers: {'Content-Type': 'application/json',
             'Accept': 'application/json',
-            'authorization':localStorage.getItem("token")}
+            'authorization':`Bearer ${localStorage.getItem("token")}`
+        }
         })
         .then(response => response.json())
         .then(data => {
@@ -46,7 +47,8 @@ async function userNumber() {
             method: 'POST',
             headers: {'Content-Type': 'application/json',
             'Accept': 'application/json',
-            'authorization':localStorage.getItem("token")},
+            'authorization':`Bearer ${localStorage.getItem("token")}`
+        },
             body: JSON.stringify({
                 "query": `query{
             fathersGetAll(_id:"${localStorage.getItem("currentUser")}"){

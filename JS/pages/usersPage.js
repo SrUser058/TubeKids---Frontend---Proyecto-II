@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             method: 'POST',
             headers: {'Content-Type': 'application/json',
             'Accept': 'application/json',
-            'authorization':localStorage.getItem("token")
+            'authorization':`Bearer ${localStorage.getItem("token")}`
         },
             body: JSON.stringify({ query })
         })
@@ -92,7 +92,7 @@ async function loginUser() {
         method: 'POST',
         headers: {'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'authorization':localStorage.getItem("token")
+        'authorization':`Bearer ${localStorage.getItem("token")}`
     },
         body: JSON.stringify({ query })
     })
@@ -124,7 +124,7 @@ async function loginAdmin() {
         method: 'POST',
         headers: {'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'authorization':localStorage.getItem("token")
+        'authorization':`Bearer ${localStorage.getItem("token")}`
     },
         body: JSON.stringify({query})
     })

@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             method: 'POST',
             headers: {'Content-Type': 'application/json',
             'Accept': 'application/json',
-            'authorization':localStorage.getItem("token")
+            'authorization':`Bearer ${localStorage.getItem("token")}`
         },
             body: JSON.stringify({ query })
         })
@@ -73,7 +73,7 @@ async function loadAdmin() {
             method: 'POST',
             headers: {'Content-Type': 'application/json',
             'Accept': 'application/json',
-            'authorization':localStorage.getItem("token")
+            'authorization':`Bearer ${localStorage.getItem("token")}`
         },
             body: JSON.stringify({ query })
         })
@@ -185,7 +185,7 @@ async function editAdminAction() {
             method: 'PATCH',
             headers: {'Content-Type': 'application/json',
             'Accept': 'application/json',
-            'authorization':localStorage.getItem("token")
+            'authorization':`Bearer ${localStorage.getItem("token")}`
         },
             body: JSON.stringify(bodySended)
         })
@@ -220,7 +220,7 @@ async function createChildAction() {
             method: 'POST',
             headers: {'Content-Type': 'application/json',
             'Accept': 'application/json',
-            'authorization':localStorage.getItem("token")
+            'authorization':`Bearer ${localStorage.getItem("token")}`
         },
             body: JSON.stringify(bodySended)
         })
@@ -251,7 +251,7 @@ async function editChildAction(childId) {
             method: 'PATCH',
             headers: {'Content-Type': 'application/json',
             'Accept': 'application/json',
-            'authorization':localStorage.getItem("token")
+            'authorization':`Bearer ${localStorage.getItem("token")}`
         },
             body: JSON.stringify(bodySended)
         })
@@ -273,7 +273,7 @@ async function deleteChildAction(childId) {
             method: 'DELETE',
             headers: {'Content-Type': 'application/json',
             'Accept': 'application/json',
-            'authorization':localStorage.getItem("token")
+            'authorization':`Bearer ${localStorage.getItem("token")}`
         }
         })
         .then(response => response.json())

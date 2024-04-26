@@ -6,8 +6,9 @@ function navEditUsers() {
     location.href = 'http://localhost:5500/editUsersPage.html';
 }
 function backPage() {
-    if(localStorage.getItem("childUser")) {localStorage.removeItem("childUser")}
-    location.href = 'http://localhost:5500/usersPage.html';
+    if(localStorage.getItem("childUser")) {
+        localStorage.removeItem("childUser")}
+        location.href = 'http://localhost:5500/usersPage.html';
 }
 function logOut() {
     localStorage.clear();
