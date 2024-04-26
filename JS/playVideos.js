@@ -5,10 +5,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     await fetch(`http://localhost:3000/graphql`, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-
-        },
+        headers: {'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'authorization':localStorage.getItem("token")
+    },
         body: JSON.stringify({ query })
     })
         .then(response => response.json())
@@ -83,10 +83,10 @@ async function loadSelectVideos() {
 
         await fetch(`http://localhost:3000/graphql`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-
-            },
+            headers: {'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'authorization':localStorage.getItem("token")
+        },
             body: JSON.stringify({ query })
         })
             .then(response => response.json())
@@ -141,10 +141,10 @@ async function searchPlaylist() {
 
     await fetch(`http://localhost:3000/graphql`, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-
-        },
+        headers: {'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'authorization':localStorage.getItem("token")
+    },
         body: JSON.stringify({ query })
     })
         .then(response => response.json())

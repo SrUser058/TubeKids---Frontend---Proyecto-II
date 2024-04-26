@@ -5,9 +5,9 @@ addEventListener('DOMContentLoaded', async () => {
     await fetch(`http://localhost:3001/api/auth/?number=${userNumber}`,
         {
             method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            }
+            headers: {'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'authorization':localStorage.getItem("token")}
         })
         .then(response => response.json())
         .then(data => {
@@ -44,9 +44,9 @@ async function userNumber() {
     await fetch(`http://localhost:3000/graphql`,
         {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: {'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'authorization':localStorage.getItem("token")},
             body: JSON.stringify({
                 "query": `query{
             fathersGetAll(_id:"${localStorage.getItem("currentUser")}"){

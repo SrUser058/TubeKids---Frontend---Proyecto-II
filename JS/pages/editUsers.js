@@ -7,9 +7,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     await fetch(`http://localhost:3000/graphql`,
         {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: {'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'authorization':localStorage.getItem("token")
+        },
             body: JSON.stringify({ query })
         })
         .then(response => response.json())
@@ -70,9 +71,10 @@ async function loadAdmin() {
     await fetch(`http://localhost:3000/graphql`,
         {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: {'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'authorization':localStorage.getItem("token")
+        },
             body: JSON.stringify({ query })
         })
         .then(response => response.json())
@@ -181,9 +183,10 @@ async function editAdminAction() {
     await fetch(`http://localhost:3001/api/father/?id=${localStorage.getItem("currentUser")}`,
         {
             method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: {'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'authorization':localStorage.getItem("token")
+        },
             body: JSON.stringify(bodySended)
         })
         .then(response => response.json())
@@ -215,9 +218,10 @@ async function createChildAction() {
     await fetch(`http://localhost:3001/api/childs/`,
         {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: {'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'authorization':localStorage.getItem("token")
+        },
             body: JSON.stringify(bodySended)
         })
         .then(response => response.json())
@@ -245,9 +249,10 @@ async function editChildAction(childId) {
     await fetch(`http://localhost:3001/api/childs/?id=${childId}`,
         {
             method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: {'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'authorization':localStorage.getItem("token")
+        },
             body: JSON.stringify(bodySended)
         })
         .then(response => response.json())
@@ -266,9 +271,10 @@ async function deleteChildAction(childId) {
     await fetch(`http://localhost:3001/api/childs/?id=${childId}`,
         {
             method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-            }
+            headers: {'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'authorization':localStorage.getItem("token")
+        }
         })
         .then(response => response.json())
         .then(data => {

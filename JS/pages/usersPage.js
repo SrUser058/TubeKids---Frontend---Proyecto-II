@@ -11,10 +11,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     await fetch(`http://localhost:3000/graphql`,
         {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-            },
+            headers: {'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'authorization':localStorage.getItem("token")
+        },
             body: JSON.stringify({ query })
         })
         .then(response => response.json())
@@ -90,10 +90,10 @@ async function loginUser() {
     }`;
     await fetch(`http://localhost:3000/graphql`, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-        },
+        headers: {'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'authorization':localStorage.getItem("token")
+    },
         body: JSON.stringify({ query })
     })
         .then(response => response.json())
@@ -122,10 +122,10 @@ async function loginAdmin() {
     }`;
     await fetch(`http://localhost:3000/graphql`, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-        },
+        headers: {'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'authorization':localStorage.getItem("token")
+    },
         body: JSON.stringify({query})
     })
         .then(response => response.json())
