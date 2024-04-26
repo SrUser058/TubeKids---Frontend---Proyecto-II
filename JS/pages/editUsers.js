@@ -52,10 +52,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 async function loadAdmin() {
-    const query = `query{fathersGetAll(_id:"${localStorage.getItem("currentUser")}"){
-        _id,name, lastname, email, phone, age, pin,
-        password, country, birthdate, status, avatar
-      }}`
+    const query = `query{
+        fathersGetAll(_id:"${localStorage.getItem('currentUser')}"){
+        name,
+        lastname,
+        email,
+        phone,
+        age,
+        pin,
+        password,
+        country,
+        birthdate,
+        status,
+        avatar
+      }
+    }`
     await fetch(`http://localhost:3000/graphql`,
         {
             method: 'POST',

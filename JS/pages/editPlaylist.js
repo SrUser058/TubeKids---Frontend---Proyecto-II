@@ -26,9 +26,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             } else {
                 data.forEach(playlist => {
                     let videosList = '';
-
+                    console.log(playlist);
                     playlist.videos.forEach(video => {
-                        videosList += `
+                        videosList += `<br>
                         <label>
                             Name
                             <input class="video_name video_input ${playlist._id} ${video._id}" type="text" value="${video.name}">
@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         getChildsInList(element.child,playlist._id)
                     });
                     getChildsOutList(playlist.father,playlist._id);
-                    loadCreateVideo(playlist.father);
+                    loadCreateVideo(playlist._id);
                 })
             };
         })
@@ -148,7 +148,7 @@ function loadCreateVideo(valueId) {
                             <input class="video_URL create_video" type="text"></label> <br>
                         <label> Description <br>
                            <textarea class="video description create_text" cols="55" rows="5"></textarea> </label>
-                           <br><button value="${valueId}" class="video " onclick="createVideoAction(this.value)">Create</button>`
+                           <br><button class="video ${valueId}" onclick="createVideoAction(this.classList[1])">Create</button>`
 };
 
 async function createPlaylist() {
@@ -156,7 +156,8 @@ async function createPlaylist() {
         "name": 'Default Playlist',
         "videos": {
             "name": "Enter a youtube URL",
-            URL: "The URL must be like: https://www.youtube.com/watch?v={Here the code of the video}"
+            "URL": "The URL must be like: https://www.youtube.com/watch?v={Here the code of the video}",
+            "description": "You can add a description about this video"
         },
         "father": localStorage.getItem("currentUser"),
         "linked": []
@@ -224,8 +225,8 @@ async function patchFetch(bodySended,valueId) {
 };
 
 function addChild(valueId) {
-    const unlinkedTag = document.getElementById('unlinked_child_select');
-    const childAdd = unlinkedTag.options[unlinkedTag.selectedIndex].classList[2];
+    const unlinkedSelect = document.getElementsByClassName(`unlinked_list ${valueId}`)[0];
+    const childAdd = unlinkedSelect.options[unlinkedSelect.selectedIndex].classList[2];
     let childs = [];
     childs.push({"child":childAdd});
     const amoung = document.getElementsByClassName(`linked ${valueId}`);
@@ -251,11 +252,12 @@ function addChild(valueId) {
         "father": localStorage.getItem("currentUser"),
         "linked": childs
     };
+    
     patchFetch(bodySended,valueId);
 }
 
 function deleteChild(valueId){
-    const linkedTag = document.getElementById('linked_child_select');
+    const linkedTag = document.getElementsByClassName(`linked_list ${valueId}`)[0];
     const childDelete = linkedTag.options[linkedTag.selectedIndex].value;
     let childs = [];
     // 
@@ -291,7 +293,8 @@ async function createVideoAction(valueId) {
     let videosList = [];
     const createVideo = {
         "name": document.getElementsByClassName('create_video')[0].value,
-        "URL": modifyURL(document.getElementsByClassName('create_video')[1].value)
+        "URL": modifyURL(document.getElementsByClassName('create_video')[1].value),
+        "description": document.getElementsByClassName('create_video')[1].value
     };
     videosList.push(createVideo);
 
@@ -311,14 +314,14 @@ async function createVideoAction(valueId) {
     for (let x = 0; x < amoung.length; x++) {
         childs.push({"child":amoung[x].classList[2]});
     }
-
+    console.log(valueId);
     const bodySended = {
         name: document.getElementsByClassName(`playlist_input ${valueId}`)[0].value,
         "videos": videosList,
         "father": localStorage.getItem("currentUser"),
         "linked": childs
     };
-
+    
     patchFetch(bodySended,valueId);
 }
 
